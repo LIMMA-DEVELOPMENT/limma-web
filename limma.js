@@ -262,22 +262,26 @@ function cm(){bgBtn.classList.remove('o');mm.classList.remove('vis');setTimeout(
     dot.style.top  = my + 'px';
     activate();
 
-    // Spark trail throttled to 55ms
+    // Spark trail — denser & more neon
     const now = Date.now();
-    if (now - sparkT > 55) {
+    if (now - sparkT > 22) {
       sparkT = now;
-      const s = document.createElement('div');
-      s.className = 'spark';
-      const sz = Math.random() * 3 + 1.2;
-      const a  = Math.random() * Math.PI * 2;
-      const d  = Math.random() * 20 + 5;
-      const col = Math.random() > .5 ? 'rgba(255,59,31,.7)' : 'rgba(232,160,32,.65)';
-      s.style.cssText =
-        `left:${mx}px;top:${my}px;width:${sz}px;height:${sz}px;` +
-        `--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;` +
-        `margin-left:-${sz/2}px;margin-top:-${sz/2}px;background:${col}`;
-      document.body.appendChild(s);
-      setTimeout(() => s.remove(), 520);
+      const burst = 2; // sparks per emit for a fuller trail
+      for (let k = 0; k < burst; k++) {
+        const s = document.createElement('div');
+        s.className = 'spark';
+        const sz = Math.random() * 4 + 2;
+        const a  = Math.random() * Math.PI * 2;
+        const d  = Math.random() * 30 + 8;
+        const col = Math.random() > .5 ? 'rgba(255,59,31,.9)' : 'rgba(232,160,32,.85)';
+        s.style.cssText =
+          `left:${mx}px;top:${my}px;width:${sz}px;height:${sz}px;` +
+          `--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;` +
+          `margin-left:-${sz/2}px;margin-top:-${sz/2}px;background:${col};` +
+          `box-shadow:0 0 ${sz*2.5}px ${col},0 0 ${sz*5}px ${col}`;
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 650);
+      }
     }
   }, {passive: true});
 
