@@ -236,15 +236,15 @@ function cm(){bgBtn.classList.remove('o');mm.classList.remove('vis');setTimeout(
   function emitStar(x, y) {
     const s = document.createElement('div');
     s.className = 'startrail';
-    s.textContent = Math.random() > .5 ? '✦' : '✧'; // ✦ / ✧
-    const col = Math.random() > .5 ? 'rgba(255,59,31,1)' : 'rgba(232,160,32,1)';
-    const sz  = Math.random() * 9 + 9;
+    // white / light-grey glowing pixel block
+    const col = Math.random() > .5 ? 'rgba(255,255,255,1)' : 'rgba(205,208,214,1)';
+    const sz  = Math.random() * 7 + 8;   // 8-15px — chunky
     s.style.cssText =
-      'left:' + x + 'px;top:' + y + 'px;color:' + col + ';font-size:' + sz + 'px;' +
-      'text-shadow:0 0 6px ' + col + ',0 0 16px ' + col + ';' +
-      '--rot:' + (Math.random() * 220 - 110) + 'deg';
+      'left:' + x + 'px;top:' + y + 'px;width:' + sz + 'px;height:' + sz + 'px;' +
+      'background:' + col + ';' +
+      'box-shadow:0 0 ' + sz + 'px rgba(255,255,255,.95),0 0 ' + (sz * 2.2) + 'px rgba(255,255,255,.6),0 0 ' + (sz * 4) + 'px rgba(200,210,255,.4)';
     document.body.appendChild(s);
-    setTimeout(function () { s.remove(); }, 720);
+    setTimeout(function () { s.remove(); }, 800);
   }
 
   function loop() {
@@ -281,10 +281,10 @@ function cm(){bgBtn.classList.remove('o');mm.classList.remove('vis');setTimeout(
     if (lastTX === null) { lastTX = mx; lastTY = my; }
     const dx = mx - lastTX, dy = my - lastTY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const step = 7;                       // px between stars
+    const step = 5;                       // px between pixels (smaller = fuller tail)
     if (dist >= step) {
       let n = Math.floor(dist / step);
-      if (n > 10) n = 10;                 // cap per move for performance
+      if (n > 14) n = 14;                 // cap per move for performance
       for (let i = 1; i <= n; i++) {
         emitStar(lastTX + dx * (i / n), lastTY + dy * (i / n));
       }
