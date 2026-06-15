@@ -228,9 +228,24 @@ function cm(){bgBtn.classList.remove('o');mm.classList.remove('vis');setTimeout(
   // We detect by first mousemove — touch devices don't fire real mousemove
   let mx = -400, my = -400;
   let rx = -400, ry = -400;
-  let sparkT = 0;
   let activated = false;
   let rafId = null;
+  let lastTX = null, lastTY = null;
+
+  // Emit one glowing star at (x,y)
+  function emitStar(x, y) {
+    const s = document.createElement('div');
+    s.className = 'startrail';
+    s.textContent = Math.random() > .5 ? '✦' : '✧'; // ✦ / ✧
+    const col = Math.random() > .5 ? 'rgba(255,59,31,1)' : 'rgba(232,160,32,1)';
+    const sz  = Math.random() * 9 + 9;
+    s.style.cssText =
+      'left:' + x + 'px;top:' + y + 'px;color:' + col + ';font-size:' + sz + 'px;' +
+      'text-shadow:0 0 6px ' + col + ',0 0 16px ' + col + ';' +
+      '--rot:' + (Math.random() * 220 - 110) + 'deg';
+    document.body.appendChild(s);
+    setTimeout(function () { s.remove(); }, 720);
+  }
 
   function loop() {
     rx += (mx - rx) * 0.115;
@@ -262,26 +277,18 @@ function cm(){bgBtn.classList.remove('o');mm.classList.remove('vis');setTimeout(
     dot.style.top  = my + 'px';
     activate();
 
-    // Spark trail — denser & more neon
-    const now = Date.now();
-    if (now - sparkT > 22) {
-      sparkT = now;
-      const burst = 2; // sparks per emit for a fuller trail
-      for (let k = 0; k < burst; k++) {
-        const s = document.createElement('div');
-        s.className = 'spark';
-        const sz = Math.random() * 4 + 2;
-        const a  = Math.random() * Math.PI * 2;
-        const d  = Math.random() * 30 + 8;
-        const col = Math.random() > .5 ? 'rgba(255,59,31,.9)' : 'rgba(232,160,32,.85)';
-        s.style.cssText =
-          `left:${mx}px;top:${my}px;width:${sz}px;height:${sz}px;` +
-          `--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;` +
-          `margin-left:-${sz/2}px;margin-top:-${sz/2}px;background:${col};` +
-          `box-shadow:0 0 ${sz*2.5}px ${col},0 0 ${sz*5}px ${col}`;
-        document.body.appendChild(s);
-        setTimeout(() => s.remove(), 650);
+    // Star TAIL — drop glowing stars along the path the cursor travels
+    if (lastTX === null) { lastTX = mx; lastTY = my; }
+    const dx = mx - lastTX, dy = my - lastTY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const step = 7;                       // px between stars
+    if (dist >= step) {
+      let n = Math.floor(dist / step);
+      if (n > 10) n = 10;                 // cap per move for performance
+      for (let i = 1; i <= n; i++) {
+        emitStar(lastTX + dx * (i / n), lastTY + dy * (i / n));
       }
+      lastTX = mx; lastTY = my;
     }
   }, {passive: true});
 
